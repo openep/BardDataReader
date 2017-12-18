@@ -179,9 +179,9 @@ classdef BardFile  < hgsetget
             elseif nargin == 1
                 if ischar(varargin{1}) && strcmpi(varargin{1}, 'openfile')
                     if isempty(openDir)
-                        openDir = stevematlabroot();
+                        openDir = matlabroot();
                     end
-                    if ~isdir(openDir); openDir = stevematlabroot(); end
+                    if ~isdir(openDir); openDir = matlabroot(); end
                     
                     [filename,pathname] = uigetfile('*.txt' ...
                         , 'Select the Bard export file.', openDir ...
