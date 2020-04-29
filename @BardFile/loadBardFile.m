@@ -1,4 +1,4 @@
-function loadBardFile(hB)
+function loadBardFile(hB, cliOnly, chPace)
     
     if ~isempty(hB.ChDataFileMap)
         error('@BARDFILE/LOADBARDFILE: there is already a datafilemap - write code to delete it if you want to do this.')
@@ -86,7 +86,7 @@ function loadBardFile(hB)
     clear data %data is a large array so get rid of it
     
     %%%%%%%%%%%%%%%%%%%%
-    if strcmpi(info.chPaced, 'no entry in file') && isempty(hB.ChStim)
+    if strcmpi(info.chPaced, 'no entry in file') && isempty(hB.ChStim) && ~cliOnly
         chList = {'none' hB.ChName{:}}; %#ok<CCAT>
         [~, fNameShort, ~] = fileparts(hB.FileName);
         [selection,ok] = listdlg(     'ListString' , chList ...
@@ -107,8 +107,14 @@ function loadBardFile(hB)
             txt = ['Channel paced: ' txt];
             inserttextintotextfile(hB.FileName, 4, txt);
         end
-    elseif strcmpi(info.chPaced, 'no entry in file')
+    elseif strcmpi(info.chPaced, 'no entry in file') && ~cliOnly
         warning('The BardFile object has a chPaced, but there isn''t one in the Bard text file. chPaced will be used.')
+    elseif cliOnly
+        if isempty(chPace)
+            hB.PrivateChStim = NaN;
+        else
+            hB.PrivateChStim = chPace;
+        end
     else
         hB.ChStim = info.chPaced;
     end
