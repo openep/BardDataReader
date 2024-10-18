@@ -10,9 +10,12 @@ classdef BardFile  < hgsetget
 %   x.egm(Label) - returns the electrogram(s) corresponding to Label. If
 %       Label is 'all' then all electrograms are returned in an array.
 % Author: Nick Linton (2009)
+%
 % Modifications - 
-
-
+%   29-4-20: Steven Williams 
+%       Modified the loadBardFile function to accept parameter-value pairs
+%       specificy 'cliOnly' for command line only calls, and 'chPace' to
+%       specify the stim channel via the command line
 
 % Public properties
     properties (SetAccess = 'protected') %orinally CONSTANTS but could be a nightmare in future.
@@ -71,7 +74,7 @@ classdef BardFile  < hgsetget
     methods
         ind = chNames2Indices(hB, chNames)
         calculateStimIndices(hB)
-        loadBardFile(hB)
+        loadBardFile(hB, cliOnly, chPace)
         reloadBardFile(hB)
         [fe, e] = filtEgm(hP, iTime, iChannel, varargin)
         [e, precedingCL, startIndex] = beat(hB, nBeat, iChannel, varargin)
@@ -176,7 +179,7 @@ classdef BardFile  < hgsetget
             persistent openDir
             if nargin == 0
                 return
-            elseif nargin == 1
+            elseif nargin > 0
                 if ischar(varargin{1}) && strcmpi(varargin{1}, 'openfile')
                     if isempty(openDir)
                         openDir = matlabroot();
@@ -208,6 +211,22 @@ classdef BardFile  < hgsetget
                     end
                 end
                 
+                % additional input
+                cliOnly = false;
+                chPace = [];
+                if nargin > 1 % parameter value pairs exist
+                    for i = 2:2:nargin
+                        switch varargin{i}
+                            case 'cliOnly'
+                                cliOnly = varargin{i+1}; %cli for command line input only 
+                            case 'chPace'
+                                chPace = varargin{i+1}; %chPace for channel pace
+                            otherwise
+                                error('BARDFILE/BARDFILE: unrecognised parameter/value pair');
+                        end
+                    end
+                end
+                
                 n = numel(allnames);
                 if n>1
                     if ~isa(obj,'BardFile')
@@ -229,7 +248,7 @@ classdef BardFile  < hgsetget
                     end
                     
                     obj(iObj).FileName = name; %#ok<*AGROW>
-                    loadBardFile(obj(iObj))
+                    loadBardFile(obj(iObj), cliOnly, chPace{iObj});
                 end
             end
         end

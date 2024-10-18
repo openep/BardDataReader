@@ -22,7 +22,7 @@ function calculateStimIndices(hB)
     
     iStim = find(pos);
     
-    t150 = round(hB.SampleRate * 150/1000);
+    t150 = round(hB.SampleRate * 120/1000); %reduced from 150ms to 120ms
     t20 = round(hB.SampleRate * 20/1000);
 
     %avoid any stims within 150ms of the end of the trace
